@@ -1,0 +1,54 @@
+<!-- staffapp/templates/staff/send_sms.html -->
+{% include 'staffapp/staffnavbar.html' %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <h2 style="text-align: center; color: #4CAF50;">Send SMS to Patient</h2>
+
+    <!-- Display success or error message -->
+    {% if success %}
+        <p style="color: green; font-weight: bold; text-align: center;">SMS sent successfully!</p>
+    {% elif error %}
+        <p style="color: red; font-weight: bold; text-align: center;">Error sending SMS. Please try again.</p>
+    {% endif %}
+
+    <form method="POST" style="margin-top: 20px;">
+        {% csrf_token %}
+
+        <!-- Phone Number Field -->
+        <div style="margin-bottom: 15px;">
+            <label for="phone_number" style="display: block; font-weight: bold; margin-bottom: 5px;">Phone Number:</label>
+            <input type="text" id="phone_number" name="phone_number" required
+                placeholder="Enter phone number (e.g., +91XXXXXXXXXX)"
+                style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+
+        <!-- Remarks Field -->
+        <div style="margin-bottom: 15px;">
+            <label for="remarks" style="display: block; font-weight: bold; margin-bottom: 5px;">Remarks:</label>
+            <textarea id="remarks" name="remarks" required
+                placeholder="Write your message here"
+                style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; height: 100px;"></textarea>
+        </div>
+
+        <!-- SMS Priority -->
+        <div style="margin-bottom: 15px;">
+            <label for="priority" style="display: block; font-weight: bold; margin-bottom: 5px;">SMS Priority:</label>
+            <select id="priority" name="priority" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                <option value="normal">Normal</option>
+                <option value="high">High</option>
+            </select>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; justify-content: space-between;">
+            <button type="submit" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
+                Send SMS
+            </button>
+            <button type="reset" style="background-color: #f44336; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
+                Clear
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

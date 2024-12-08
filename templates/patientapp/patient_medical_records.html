@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+{% extends 'patientapp/patientnavbar.html' %}
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Medical Records</title>
+    <style>
+        body {
+            background-color: #f4f6f9;
+            font-family: Arial, sans-serif;
+        }
+        h2 {
+            color: #495057;
+            text-align: center;
+            margin-top: 30px;
+        }
+        .list-group-item {
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            margin-bottom: 10px;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .container {
+            margin-top: 40px;
+            max-width: 900px; /* Adjust container width for better readability */
+        }
+    </style>
+</head>
+<body>
+    {% block body %}
+    <div class="container">
+        <h2>Your Medical Records</h2>
+        {% if medical_records %}
+            <ul class="list-group">
+                {% for record in medical_records %}
+                    <li class="list-group-item">
+                        <strong>Date:</strong> {{ record.date }}<br>
+                        <strong>Doctor:</strong> Dr. {{ record.doctor.username }}<br>
+                        <strong>Description:</strong> {{ record.description }}<br>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No medical records available.</p>
+        {% endif %}
+    </div>
+    {% endblock %}
+</body>
+</html>

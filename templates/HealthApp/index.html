@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Profile Management Platform</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+   <style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f7f6;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    header {
+        background: rgba(85, 30, 255, 1); /* Dark blue glass effect */
+        backdrop-filter: blur(10px); /* Glass blur effect */
+        color: white;
+        text-align: center;
+        padding: 20px;
+        border-radius: 0 0 0px 0px; /* Rounded corners on the bottom */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+    }
+
+    nav {
+        display: flex;
+        justify-content: center;
+        background: rgba(85, 30, 255, 1); /* Dark blue glass effect */
+        backdrop-filter: blur(10px); /* Glass blur effect */
+        border-radius: 0px;
+        padding: 10px;
+        margin: 0px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+    }
+
+    nav a {
+        color: white;
+        margin: 0 15px;
+        text-decoration: none;
+        font-size: 18px;
+        font-weight: bold;
+        text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.6); /* Text shadow for visibility */
+        transition: transform 0.3s ease, font-size 0.3s ease;
+    }
+
+    nav a:hover {
+        transform: scale(1.2);
+        font-size: 20px;
+    }
+</style>
+
+
+
+
+</head>
+<body>
+
+    <header>
+        <h1>Welcome to the Health Profile Management Platform</h1>
+    </header>
+
+    <nav>
+        <a href="/register">Register</a>
+        <a href="/login">Login</a>
+    </nav>
+
+    <div id="carouselExample" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="{% static 'images/HP-1.png' %}" class="d-block w-100" alt="Health Image 1">
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'images/HP-2.png' %}" class="d-block w-100" alt="Health Image 2">
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'images/HP-3.jpg' %}" class="d-block w-100" alt="Health Image 3">
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+
+
+
+    <footer>
+        <p>&copy; 2024 Health Profile Management Platform</p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

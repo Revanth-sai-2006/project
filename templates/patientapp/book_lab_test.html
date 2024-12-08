@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+{% extends 'patientapp/patientnavbar.html' %}
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Lab Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script>
+        const bookedTests = []; // Array to store booked tests
+
+        // Ensure the selected date is at least 24 hours from today
+        window.onload = function () {
+            var today = new Date();
+            today.setHours(today.getHours() + 24); // Add 24 hours
+            var minDate = today.toISOString().split('T')[0]; // Format as yyyy-mm-dd
+            document.getElementById('appointment_date').setAttribute('min', minDate);
+        };
+
+        // Update total amount based on selected tests
+        function updateTotal() {
+            const testPrices = {
+                cbc: 500,
+                xray: 1000,
+                ecg: 800,
+                viral: 1200,
+                lipid: 1500,
+                sugar: 400,
+                thyroid: 700,
+                urine: 600,
+                vitaminD: 1000
+            };
+
+            let total = 0;
+            const checkboxes = document.querySelectorAll('input[name="lab_tests"]:checked');
+            checkboxes.forEach((checkbox) => {
+                total += testPrices[checkbox.value];
+            });
+
+            document.getElementById('total_amount').innerText = `Total Amount: ₹${total}`;
+        }
+
+        // Display success message and add booked test details
+        function handleFormSubmission(event) {
+            event.preventDefault(); // Prevent form submission
+
+            const patientName = document.getElementById("patient_name").value;
+            const address = document.getElementById("address").value;
+            const appointmentDate = document.getElementById("appointment_date").value;
+            const appointmentTime = document.getElementById("appointment_time").value;
+
+            const selectedTests = Array.from(document.querySelectorAll('input[name="lab_tests"]:checked'))
+                .map(checkbox => checkbox.parentElement.textContent.trim());
+
+            if (selectedTests.length === 0) {
+                alert("Please select at least one lab test.");
+                return;
+            }
+
+            const bookedTestDetails = {
+                patientName,
+                address,
+                appointmentDate,
+                appointmentTime,
+                tests: selectedTests,
+            };
+
+            bookedTests.push(bookedTestDetails); // Add details to the bookedTests array
+            displayBookedTests(); // Display the booked tests
+
+            alert(`Lab Test Booked Successfully for ${patientName}`);
+            document.getElementById("labTestForm").reset(); // Reset form
+            document.getElementById('total_amount').innerText = "Total Amount: ₹0"; // Reset total amount
+        }
+
+        // Display booked tests
+        function displayBookedTests() {
+            const bookedTestsSection = document.getElementById("bookedTests");
+            bookedTestsSection.innerHTML = ""; // Clear previous content
+
+            bookedTests.forEach((test, index) => {
+                const testDetails = `
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Booking #${index + 1}</h5>
+                            <p><strong>Patient Name:</strong> ${test.patientName}</p>
+                            <p><strong>Address:</strong> ${test.address}</p>
+                            <p><strong>Appointment Date:</strong> ${test.appointmentDate}</p>
+                            <p><strong>Appointment Time:</strong> ${test.appointmentTime}</p>
+                            <p><strong>Selected Tests:</strong> ${test.tests.join(", ")}</p>
+                        </div>
+                    </div>
+                `;
+                bookedTestsSection.innerHTML += testDetails;
+            });
+        }
+    </script>
+</head>
+<body>
+{% block body %}
+<div class="container mt-5">
+    <h2>Book Lab Test</h2>
+
+    <!-- Booked Tests Section -->
+    <div id="bookedTests" class="mb-5">
+        <!-- Booked tests will appear here -->
+    </div>
+
+    <!-- Booking Form -->
+    <form id="labTestForm" action="#" method="POST" onsubmit="handleFormSubmission(event)">
+        {% csrf_token %}  <!-- CSRF token for security -->
+
+        <!-- Patient Name -->
+        <div class="mb-3">
+            <label for="patient_name" class="form-label">Patient Name</label>
+            <input type="text" class="form-control" id="patient_name" name="patient_name" required>
+        </div>
+
+        <!-- Address -->
+        <div class="mb-3">
+            <label for="address" class="form-label">Address</label>
+            <input type="text" class="form-control" id="address" name="address" required>
+        </div>
+
+        <!-- Appointment Date -->
+        <div class="mb-3">
+            <label for="appointment_date" class="form-label">Appointment Date</label>
+            <input type="date" class="form-control" id="appointment_date" name="appointment_date" required>
+        </div>
+
+        <!-- Appointment Time -->
+        <div class="mb-3">
+            <label for="appointment_time" class="form-label">Appointment Time</label>
+            <input type="time" class="form-control" id="appointment_time" name="appointment_time" required>
+        </div>
+
+        <!-- Lab Test Details -->
+        <div class="mb-3">
+            <label class="form-label">Lab Test Details</label>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="cbc" name="lab_tests" value="cbc" onclick="updateTotal()">
+                <label class="form-check-label" for="cbc">
+                    Complete Blood Count (CBC) - ₹500 - Report in 1 day
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="xray" name="lab_tests" value="xray" onclick="updateTotal()">
+                <label class="form-check-label" for="xray">
+                    Chest X-Ray - ₹1000 - Report in 1 day
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="ecg" name="lab_tests" value="ecg" onclick="updateTotal()">
+                <label class="form-check-label" for="ecg">
+                    ECG - ₹800 - Report in 2 hours
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="viral" name="lab_tests" value="viral" onclick="updateTotal()">
+                <label class="form-check-label" for="viral">
+                    Viral Test - ₹1200 - Report in 2 days
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="lipid" name="lab_tests" value="lipid" onclick="updateTotal()">
+                <label class="form-check-label" for="lipid">
+                    Lipid Profile - ₹1500 - Report in 2 days
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="sugar" name="lab_tests" value="sugar" onclick="updateTotal()">
+                <label class="form-check-label" for="sugar">
+                    Blood Sugar Test - ₹400 - Report in 2 hours
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="thyroid" name="lab_tests" value="thyroid" onclick="updateTotal()">
+                <label class="form-check-label" for="thyroid">
+                    Thyroid Test - ₹700 - Report in 1 day
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="urine" name="lab_tests" value="urine" onclick="updateTotal()">
+                <label class="form-check-label" for="urine">
+                    Urine Test - ₹600 - Report in 1 day
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="vitaminD" name="lab_tests" value="vitaminD" onclick="updateTotal()">
+                <label class="form-check-label" for="vitaminD">
+                    Vitamin D Test - ₹1000 - Report in 2 days
+                </label>
+            </div>
+        </div>
+
+        <!-- Total Amount -->
+        <div class="mt-3">
+            <h5 id="total_amount">Total Amount: ₹0</h5>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary">Book Lab Test</button>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
+</body>
+</html>

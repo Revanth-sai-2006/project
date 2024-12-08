@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Staff Navbar</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg flex-shrink-3 py-sm-1" style="background-color: {% if user.is_authenticated %} #28a745 {% else %} #d65353 {% endif %};">
+  <div class="container-fluid">
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'staffapp:staffhomepage' %}">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/appointments/' %}active{% endif %}" href="{% url 'staffapp:appointments' %}">Appointments</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/medical_records/' %}active{% endif %}" href="{% url 'staffapp:medical_records' %}">Medical Records</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/register_patient/' %}active{% endif %}" href="{% url 'staffapp:register_patient' %}">Register Patient</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/add_staff/' %}active{% endif %}" href="{% url 'staffapp:add_staff' %}">Add Staff</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/staff_list/' %}active{% endif %}" href="{% url 'staffapp:staff_list' %}">Staff list</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/patient_list/' %}active{% endif %}" href="{% url 'staffapp:patient_list' %}">patient list</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'staffapp:send_sms' %}" style="background-color: white; color: green; font-size: 16px; padding: 8px 15px; border-radius: 5px;">Remarks</a>
+        </li>
+
+
+      </ul>
+
+      <form class="d-flex" role="search">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success" type="submit">Search</button>
+      </form>
+    </div>
+
+    <ul class="navbar-nav ms-auto">
+      {% if user.is_authenticated %}
+      <li class="nav-item">
+        <span class="nav-link">Welcome, {{ user.username }}</span>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'staffapp:logout' %}">Logout</a>
+      </li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>
+
+{% block body %}
+{% endblock %}
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff App with Chatbot</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Chatbot styles */
+        .chatbot-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 50vh; /* Take up half the screen height */
+            background-color: #fff;
+            border: none;
+            box-shadow: none;
+            border-radius: 0;
+            display: block; /* Initially visible */
+            z-index: 1000;
+        }
+        .chatbot-header {
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 2rem; /* Increased text size */
+        }
+        .chatbot-box {
+            height: calc(50vh - 100px); /* Fill remaining space below header */
+            overflow-y: scroll;
+            padding: 15px;
+            background-color: #fafafa;
+            font-size: 1.2rem; /* Increased text size */
+        }
+        .chatbot-input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-top: 1px solid #ddd;
+            font-size: 1.5rem; /* Increased input text size */
+            border-radius: 0 0 10px 10px;
+        }
+        .chat-message {
+            margin: 10px 0;
+        }
+        .user-message {
+            text-align: right;
+            color: #007bff;
+            font-size: 1.5rem; /* Increased text size for user */
+        }
+        .bot-message {
+            text-align: left;
+            color: #333;
+            font-size: 1.5rem; /* Increased text size for bot */
+        }
+        .exit-fullscreen-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            font-size: 18px;
+            border-radius: 50%;
+            padding: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Fullscreen Chatbot Modal -->
+    <div class="chatbot-modal" id="chatbotModal">
+        <div class="chatbot-header">
+            <h5>Chatbot</h5>
+            <button class="exit-fullscreen-btn" id="exitFullscreenBtn" onclick="exitFullscreen()">X</button>
+        </div>
+        <div class="chatbot-box" id="chatBox"></div>
+        <input type="text" id="userInput" class="chatbot-input" placeholder="Type a message..." onkeydown="if(event.key === 'Enter'){sendMessage()}">
+    </div>
+
+    <script>
+        const chatBox = document.getElementById('chatBox');
+        const userInput = document.getElementById('userInput');
+        const chatbotModal = document.getElementById('chatbotModal');
+        const exitFullscreenBtn = document.getElementById('exitFullscreenBtn');
+
+        // Predefined bot responses
+        const botResponses = {
+            "hi": "Hello! How can I assist you today?",
+            "how are you": "I'm doing great, thank you for asking!",
+            "what is your name": "I am a chatbot created to help you!",
+            "bye": "Goodbye! Have a great day!",
+            "default": "Sorry, I didn't understand that. Can you please rephrase?",
+            "appointment": "You can book an appointment with a doctor online or by calling the clinic.",
+    "medicine": "Please let me know the name of the medicine you're looking for.",
+    "medication": "Do you need advice on a specific medication?",
+    "doctor": "A doctor will be able to assist you with your medical concerns.",
+    "nurse": "A nurse can help with patient care and health monitoring.",
+    "lab tests": "Lab tests are important for diagnosing various health conditions.",
+    "prescription": "You may need a prescription for certain medications.",
+    "heart disease": "Heart disease can be managed through medication, lifestyle changes, and monitoring.",
+    "diabetes": "Managing diabetes involves proper medication, diet, and regular checkups.",
+    "cancer": "Cancer treatment depends on the type and stage. Consult a specialist for the best options.",
+    "blood pressure": "High blood pressure can be controlled through medication and lifestyle changes.",
+    "cholesterol": "Cholesterol levels can be controlled with diet, exercise, and medication.",
+    "stomach ache": "Stomach aches can be caused by various factors, from indigestion to infections.",
+    "headache": "A headache can be treated with rest, hydration, and pain relievers.",
+    "fever": "Fever usually indicates an infection. Stay hydrated and take fever-reducing medications.",
+    "cold": "Cold symptoms can be managed with rest, fluids, and over-the-counter medicines.",
+    "flu": "The flu requires rest, hydration, and possibly antiviral medications.",
+    "pain management": "Pain management depends on the type of pain. It can include medication, therapy, or other treatments.",
+    "back pain": "Back pain can be relieved through exercises, posture correction, and, in some cases, medication.",
+    "stress": "Stress management techniques include exercise, relaxation, and talking to a professional.",
+    "anxiety": "Anxiety can be managed with therapy, medication, and relaxation exercises.",
+    "depression": "Depression requires professional treatment. Therapy and medications can be effective.",
+    "sleep disorder": "Sleep disorders can be managed through lifestyle changes, therapy, or medication.",
+    "allergy": "Allergies can be treated with antihistamines and by avoiding allergens.",
+    "feeling tired": "Tiredness can be due to various factors like poor sleep, stress, or illness.",
+    "stressed": "Stress can be managed through relaxation techniques, exercise, and therapy.",
+    "high blood sugar": "High blood sugar can be managed with insulin, diet, and regular monitoring.",
+    "low blood sugar": "Low blood sugar requires immediate intake of sugar or a fast-acting carbohydrate.",
+    "diabetic care": "Diabetic care involves maintaining blood sugar levels through diet, exercise, and medication.",
+    "vaccination": "Vaccination helps protect against various infectious diseases.",
+    "cough": "A cough can be caused by infections or allergies. Treatment depends on the cause.",
+    "nausea": "Nausea can be treated with medication, hydration, and rest.",
+    "vomiting": "Vomiting often requires rest, hydration, and sometimes medication to settle the stomach.",
+    "chronic pain": "Chronic pain management may include medications, therapy, and lifestyle changes.",
+    "physical therapy": "Physical therapy helps restore movement and reduce pain after injuries or surgeries.",
+    "rehabilitation": "Rehabilitation is a process of recovery after surgery, injury, or illness.",
+    "X-ray": "An X-ray is used to view the inside of your body, typically for bones and joints.",
+    "MRI": "MRI (Magnetic Resonance Imaging) provides detailed images of soft tissues in the body.",
+    "ultrasound": "An ultrasound is often used for viewing organs, blood vessels, and even during pregnancy.",
+    "blood test": "A blood test is used to check for various health markers, including cholesterol and blood sugar levels.",
+    "urine test": "A urine test helps diagnose urinary tract infections, kidney problems, and other conditions.",
+    "ECG": "An ECG (Electrocardiogram) measures the electrical activity of your heart.",
+    "cholesterol test": "A cholesterol test measures the levels of fats in your blood, which are important for heart health.",
+    "blood sugar test": "A blood sugar test helps diagnose and manage diabetes.",
+    "blood culture": "A blood culture is used to detect infections in the blood.",
+    "pregnancy test": "A pregnancy test detects the hormone HCG, which is present during pregnancy.",
+    "thyroid test": "A thyroid test measures the levels of thyroid hormones to assess thyroid function.",
+    "liver function test": "A liver function test checks the health of your liver and its ability to perform essential tasks.",
+    "kidney function test": "A kidney function test measures how well your kidneys are filtering waste.",
+    "prostate exam": "A prostate exam checks for issues related to the prostate, such as enlargement or cancer.",
+    "cancer screening": "Cancer screening tests detect cancer at an early stage, when it is most treatable.",
+    "mental health": "Mental health is an essential part of overall well-being. Therapy, medication, and support can help.",
+    "cognitive behavioral therapy": "Cognitive behavioral therapy (CBT) helps manage anxiety, depression, and other mental health conditions.",
+    "psychotherapy": "Psychotherapy involves talking with a therapist to address mental health issues.",
+    "depression symptoms": "Depression symptoms include persistent sadness, loss of interest, and changes in appetite or sleep.",
+    "anxiety symptoms": "Anxiety symptoms include excessive worry, rapid heartbeat, and difficulty sleeping.",
+    "panic attacks": "Panic attacks are sudden periods of intense fear and discomfort that can be treated with therapy and medication.",
+    "mental health care": "Mental health care includes therapy, medication, and lifestyle changes to manage conditions like depression and anxiety.",
+    "self-care": "Self-care involves taking steps to care for your own health and well-being, such as relaxation, exercise, and nutrition.",
+    "mental health professional": "A mental health professional can diagnose and treat mental health conditions such as depression and anxiety.",
+    "counseling": "Counseling involves talking to a trained professional to address personal, social, or psychological issues.",
+    "therapist": "A therapist helps individuals with emotional and psychological problems through various therapeutic techniques.",
+    "support groups": "Support groups provide a space for individuals to share experiences and offer mutual support.",
+    "nutritional advice": "Nutritional advice can help you maintain a balanced diet and manage various health conditions.",
+    "exercise routine": "An exercise routine helps improve physical health, manage stress, and prevent chronic diseases.",
+    "healthy lifestyle": "A healthy lifestyle includes regular exercise, a balanced diet, and sufficient sleep.",
+    "weight management": "Weight management involves balancing calorie intake and expenditure to maintain a healthy weight.",
+    "healthy eating": "Healthy eating involves consuming a variety of nutritious foods in appropriate portions.",
+    "heart health": "Heart health can be improved through a balanced diet, exercise, and avoiding smoking.",
+    "diabetes care": "Diabetes care involves monitoring blood sugar, taking medications, and managing diet and exercise.",
+    "high blood pressure management": "Managing high blood pressure involves medication, diet changes, and regular monitoring.",
+    "smoking cessation": "Quitting smoking reduces the risk of heart disease, lung cancer, and other health issues.",
+    "addiction treatment": "Addiction treatment may involve therapy, support groups, and medication to help individuals recover.",
+    "rehabilitation services": "Rehabilitation services help individuals recover from injuries, surgeries, or substance abuse.",
+    "health insurance": "Health insurance helps cover medical expenses, including doctor visits, hospital stays, and medications.",
+    "preventive care": "Preventive care includes regular checkups, vaccinations, and screenings to catch health issues early.",
+    "wellness checkup": "A wellness checkup is a routine examination to assess overall health and catch potential issues early.",
+    "health screening": "Health screenings can help detect diseases like cancer, diabetes, and high blood pressure before symptoms appear.",
+    "family doctor": "A family doctor provides comprehensive healthcare for individuals of all ages and addresses various health concerns.",
+    "specialist": "A specialist is a doctor who focuses on a particular area of medicine, such as cardiology or dermatology.",
+    "telemedicine": "Telemedicine allows you to consult with a healthcare provider remotely via phone or video call.",
+    "emergency care": "Emergency care involves immediate treatment for life-threatening injuries or conditions.",
+    "surgery": "Surgery involves medical procedures to treat or manage various health conditions, often requiring recovery time.",
+    "patient care": "Patient care involves the medical and emotional support provided to patients during their treatment and recovery.",
+    "hospital care": "Hospital care includes inpatient services, such as treatment, surgery, and monitoring of patients.",
+    "health": "Health is a state of complete physical, mental, and social well-being. How can I assist you with your health?",
+    "wellness": "Wellness is the pursuit of physical, mental, and emotional health. What aspect of wellness would you like to know about?",
+    "fitness": "Fitness is the ability to perform physical activities. Regular exercise is key to maintaining good fitness.",
+    "medicine": "Please let me know the name of the medicine you're looking for.",
+
+        };
+
+        // Function to display the user's message
+        function displayUserMessage(message) {
+            const userMessage = document.createElement('div');
+            userMessage.classList.add('chat-message', 'user-message');
+            userMessage.innerText = message;
+            chatBox.appendChild(userMessage);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Function to display the bot's message
+        function displayBotMessage(message) {
+            const botMessage = document.createElement('div');
+            botMessage.classList.add('chat-message', 'bot-message');
+            botMessage.innerText = message;
+            chatBox.appendChild(botMessage);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Function to handle sending a message
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (message) {
+                displayUserMessage(message);
+                userInput.value = '';
+
+                // Bot response logic
+                const lowerCaseMessage = message.toLowerCase();
+                const response = botResponses[lowerCaseMessage] || botResponses["default"];
+                setTimeout(() => displayBotMessage(response), 1000);
+            }
+        }
+
+        // Enable fullscreen mode
+        function enterFullscreen() {
+            chatbotModal.style.height = "100vh";
+            chatbotModal.style.width = "100vw";
+        }
+
+        // Exit fullscreen mode
+        function exitFullscreen() {
+            chatbotModal.style.height = "50vh"; /* Half of screen */
+            chatbotModal.style.width = "100vw"; /* Full width */
+        }
+
+        // Automatically display the chatbot in fullscreen when the page loads
+        window.onload = function() {
+            enterFullscreen();  // Opens the chatbot in full-screen mode as soon as the page is loaded
+        };
+
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

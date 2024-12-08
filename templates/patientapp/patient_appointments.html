@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+{% extends 'patientapp/patientnavbar.html' %}
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Appointments</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+        h2 {
+            color: #343a40;
+        }
+        .list-group-item {
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            margin-bottom: 10px;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .container {
+            margin-top: 40px;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+{% block body %}
+    <div class="container">
+        <h2>Your Appointments</h2>
+        {% if appointments %}
+            <ul class="list-group">
+                {% for appointment in appointments %}
+                    <li class="list-group-item">
+                        <strong>Date:</strong> {{ appointment.date }}<br>
+                        <strong>Time:</strong> {{ appointment.time }}<br>
+                        <strong>Doctor:</strong> Dr. {{ appointment.doctor.username }}<br>
+                        <strong>Reason:</strong> {{ appointment.reason }}<br>
+                        {% if appointment.notes %}
+                            <strong>Notes:</strong> {{ appointment.notes }}<br>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>You have no appointments.</p>
+        {% endif %}
+    </div>
+{% endblock %}
+</body>
+</html>

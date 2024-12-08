@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicine Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .container {
+            width: 50%;
+            margin: 0 auto;
+        }
+
+        #medicineResults {
+            margin-top: 20px;
+        }
+
+        .medicine-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .medicine-list li {
+            padding: 10px;
+            background-color: #f4f4f4;
+            margin-bottom: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .medicine-list li:hover {
+            background-color: #ddd;
+        }
+
+        #medicineDetail {
+            margin-top: 20px;
+            display: none;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        #medicineDetail h2 {
+            margin-top: 0;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Medicine Search</h1>
+
+    <div class="container">
+        <form id="medicineSearchForm">
+            <label for="medicine">Search for a medicine:</label>
+            <input type="text" id="medicine" name="medicine" placeholder="Enter medicine name" required>
+            <button type="submit">Search</button>
+        </form>
+
+        <div id="medicineResults"></div>
+
+        <div id="medicineDetail">
+            <h2>Medicine Details</h2>
+            <p><strong>Name:</strong> <span id="medicineName"></span></p>
+            <p><strong>Usage:</strong> <span id="medicineUsage"></span></p>
+            <p><strong>Dosage:</strong> <span id="medicineDosage"></span></p>
+            <button onclick="showSearchResults()">Back to Search</button>
+        </div>
+    </div>
+
+    <script>
+        // Example medicine data
+        const medicines = [
+            { name: "Paracetamol", usage: "Pain relief", dosage: "500mg" },
+            { name: "Aspirin", usage: "Anti-inflammatory", dosage: "100mg" },
+            { name: "Amoxicillin", usage: "Antibiotic", dosage: "250mg" },
+            { name: "Ibuprofen", usage: "Pain relief", dosage: "200mg" },
+            { name: "Metformin", usage: "Diabetes management", dosage: "500mg" }
+        ];
+
+        // Event listener for form submit
+        document.getElementById('medicineSearchForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form submission
+
+            const medicineInput = document.getElementById('medicine').value.toLowerCase();
+            const medicineResultsDiv = document.getElementById('medicineResults');
+            const medicineDetailDiv = document.getElementById('medicineDetail');
+            const medicineNameSpan = document.getElementById('medicineName');
+            const medicineUsageSpan = document.getElementById('medicineUsage');
+            const medicineDosageSpan = document.getElementById('medicineDosage');
+
+            // Clear previous results
+            medicineResultsDiv.innerHTML = '';
+            medicineDetailDiv.style.display = 'none';
+
+            // Filter medicines based on search input
+            const filteredMedicines = medicines.filter(medicine =>
+                medicine.name.toLowerCase().includes(medicineInput)
+            );
+
+            // If no matching medicine is found
+            if (filteredMedicines.length === 0) {
+                medicineResultsDiv.innerHTML = '<p>No medicines found.</p>';
+                return;
+            }
+
+            // Display search results
+            const medicineList = document.createElement('ul');
+            medicineList.classList.add('medicine-list');
+            filteredMedicines.forEach(medicine => {
+                const li = document.createElement('li');
+                li.textContent = medicine.name;
+                li.onclick = function() {
+                    // Display the details when a medicine is clicked
+                    medicineNameSpan.textContent = medicine.name;
+                    medicineUsageSpan.textContent = medicine.usage;
+                    medicineDosageSpan.textContent = medicine.dosage;
+                    medicineResultsDiv.innerHTML = ''; // Clear search results
+                    medicineDetailDiv.style.display = 'block'; // Show medicine details
+                };
+                medicineList.appendChild(li);
+            });
+
+            medicineResultsDiv.appendChild(medicineList);
+        });
+
+        // Show search results again
+        function showSearchResults() {
+            const medicineResultsDiv = document.getElementById('medicineResults');
+            const medicineDetailDiv = document.getElementById('medicineDetail');
+            medicineDetailDiv.style.display = 'none';
+            medicineResultsDiv.innerHTML = ''; // Clear previous results
+        }
+    </script>
+</body>
+</html>
